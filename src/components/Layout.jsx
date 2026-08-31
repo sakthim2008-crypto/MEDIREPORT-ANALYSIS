@@ -14,7 +14,7 @@ const Layout = ({ username, onLogout }) => {
         <div className="container flex items-center justify-between py-4" style={{ padding: '1rem 2rem' }}>
           <Link to="/" className="flex items-center gap-2 text-lg font-bold" style={{ color: 'white' }}>
             <Activity className="text-primary" size={28} />
-            <span>Medi<span className="text-primary">Lens</span></span>
+            <span className="text-gradient" style={{ fontSize: '1.25rem', letterSpacing: '1px' }}>MediLens</span>
           </Link>
           <nav className="flex items-center gap-6">
             <Link to="/" className={`flex items-center gap-2 ${isActive('/')}`}>
