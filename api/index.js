@@ -51,6 +51,23 @@ app.get(['/api/reports/:id', '/reports/:id'], (req, res) => {
   }
 });
 
+// Delete specific report
+app.delete(['/api/reports/:id', '/reports/:id'], (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== 'Bearer auth-token-xyz') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  const initialLength = globalReports.length;
+  globalReports = globalReports.filter(r => r.id !== req.params.id);
+  
+  if (globalReports.length < initialLength) {
+    res.json({ success: true, message: 'Report deleted successfully' });
+  } else {
+    res.status(404).json({ error: 'Report not found' });
+  }
+});
+
 const SYSTEM_PROMPT = `
 You are an AI-powered Medical Report Analysis and Patient Education Assistant.
 Follow the Master System Prompt rules strictly to output accurate JSON for CBC, Thyroid, RBS, Vit D3, Calcium, B12, or Prescriptions.

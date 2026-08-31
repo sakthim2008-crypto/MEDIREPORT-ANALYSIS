@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, FileText, Activity, TrendingUp } from 'lucide-react';
-import { fetchReports } from '../services/aiService';
+import { Upload, FileText, Activity, TrendingUp, Trash2 } from 'lucide-react';
+import { fetchReports, deleteReport } from '../services/aiService';
 
 const Dashboard = ({ token }) => {
   const [reports, setReports] = useState([]);
@@ -21,6 +21,18 @@ const Dashboard = ({ token }) => {
     loadReports();
   }, [token]);
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to permanently delete this report analysis?')) return;
+    
+    try {
+      await deleteReport(id, token);
+      setReports(reports.filter(r => r.id !== id));
+    } catch (err) {
+      console.error("Failed to delete report", err);
+      alert('Failed to delete report. Please try again.');
+    }
+  };
+
   const needsReviewCount = reports.filter(r => 
     r.tests && r.tests.some(t => t.status === 'HIGH' || t.status === 'LOW')
   ).length;
@@ -28,7 +40,7 @@ const Dashboard = ({ token }) => {
   return (
     <div className="container animate-fade-in" style={{ padding: '2rem' }}>
       <div className="flex-col items-center justify-center text-center py-8">
-        <h1 className="mb-4">Welcome to Medi<span className="text-primary">Lens</span></h1>
+        <h1 className="mb-4">Welcome to Medi<span className="text-primary text-gradient">Lens</span></h1>
         <p className="text-muted text-lg max-w-2xl mx-auto mb-8">
           Upload your medical reports for instant, patient-friendly AI analysis and visual insights.
         </p>
@@ -94,7 +106,7 @@ const Dashboard = ({ token }) => {
         ) : (
           <div className="flex-col gap-4" style={{ display: 'flex', flexDirection: 'column' }}>
             {reports.map((report) => (
-              <div key={report.id} className="flex items-center justify-between p-4 rounded" style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
+              <div key={report.id} className="flex items-center justify-between p-4 rounded hover-card" style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
                 <div className="flex items-center gap-4">
                   <FileText className="text-muted" size={20} />
                   <div>
@@ -102,7 +114,17 @@ const Dashboard = ({ token }) => {
                     <p className="text-sm text-muted">{new Date(report.date).toLocaleString()}</p>
                   </div>
                 </div>
-                <Link to={`/result/${report.id}`} className="btn btn-outline" style={{ padding: '0.5rem 1rem' }}>View Analysis</Link>
+                <div className="flex items-center gap-3">
+                  <Link to={`/result/${report.id}`} className="btn btn-outline" style={{ padding: '0.5rem 1rem' }}>View Analysis</Link>
+                  <button 
+                    onClick={() => handleDelete(report.id)} 
+                    className="btn btn-danger-glass" 
+                    style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    title="Delete Report"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

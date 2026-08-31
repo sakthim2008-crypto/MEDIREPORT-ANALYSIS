@@ -29,6 +29,15 @@ export const fetchReportById = async (id, token) => {
   return await response.json();
 };
 
+export const deleteReport = async (id, token) => {
+  const response = await fetch(`/api/reports/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error('Failed to delete report');
+  return await response.json();
+};
+
 export const processMedicalReport = async (file, token) => {
   if (!file) throw new Error('No file provided');
 

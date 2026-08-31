@@ -228,6 +228,21 @@ a:hover {
   border-color: var(--border-hover);
 }
 
+.btn-danger-glass {
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: var(--status-high);
+  transition: all 0.3s ease;
+}
+
+.btn-danger-glass:hover {
+  background: rgba(244, 63, 94, 0.8);
+  border-color: rgba(244, 63, 94, 1);
+  color: white;
+  box-shadow: 0 0 15px rgba(244, 63, 94, 0.5);
+  transform: translateY(-2px);
+}
+
 /* Badges */
 .badge {
   display: inline-flex;
