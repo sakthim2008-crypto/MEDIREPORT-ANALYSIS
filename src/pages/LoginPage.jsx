@@ -17,7 +17,7 @@ const LoginPage = ({ onLogin }) => {
       onLogin(data.token, data.username);
       navigate('/');
     } catch (err) {
-      setError('Invalid credentials. Use demo / demo');
+      setError(err.message || 'Invalid credentials. Use demo / demo');
     }
   };
 

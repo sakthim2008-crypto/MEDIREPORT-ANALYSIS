@@ -2,11 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
 import { OpenAI } from 'openai';
-import { createRequire } from 'module';
 import * as dotenv from 'dotenv';
-
-const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
 
 dotenv.config();
 
@@ -27,7 +23,7 @@ let globalReports = [];
 const VALID_USERS = { "demo": "demo" };
 
 // Authentication Endpoint
-app.post('/api/login', (req, res) => {
+app.post(['/api/login', '/login'], (req, res) => {
   const { username, password } = req.body;
   if (VALID_USERS[username] === password) {
     res.json({ token: 'auth-token-xyz', username: username });
@@ -37,7 +33,7 @@ app.post('/api/login', (req, res) => {
 });
 
 // Fetch User Reports
-app.get('/api/reports', (req, res) => {
+app.get(['/api/reports', '/reports'], (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || authHeader !== 'Bearer auth-token-xyz') {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -46,7 +42,7 @@ app.get('/api/reports', (req, res) => {
 });
 
 // Fetch specific report
-app.get('/api/reports/:id', (req, res) => {
+app.get(['/api/reports/:id', '/reports/:id'], (req, res) => {
   const report = globalReports.find(r => r.id === req.params.id);
   if (report) {
     res.json(report);
@@ -179,7 +175,7 @@ const jsonSchema = {
   strict: true
 };
 
-app.post('/api/analyze', upload.single('file'), async (req, res) => {
+app.post(['/api/analyze', '/analyze'], upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
@@ -190,6 +186,8 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
       let messages = [{ role: "system", content: SYSTEM_PROMPT }];
 
       if (file.mimetype === 'application/pdf') {
+        const pdfParseModule = await import('pdf-parse');
+        const pdfParse = pdfParseModule.default || pdfParseModule;
         const pdfData = await pdfParse(file.buffer);
         messages.push({ role: "user", content: `Analyze this PDF text:\n\n${pdfData.text}` });
       } else if (file.mimetype.startsWith('image/')) {
