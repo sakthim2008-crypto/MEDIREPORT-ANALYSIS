@@ -34,8 +34,14 @@ export const deleteReport = async (id, token) => {
     method: 'DELETE',
     headers: { 'Authorization': `Bearer ${token}` }
   });
-  if (!response.ok) throw new Error('Failed to delete report');
-  return await response.json();
+  // In serverless environments, memory is ephemeral. 
+  // If it returns 404, it's already "deleted" from that instance's memory, so we treat it as success.
+  if (!response.ok && response.status !== 404) {
+    throw new Error('Failed to delete report');
+  }
+  
+  // Only parse JSON if there's actually a body, or just return success
+  return { success: true };
 };
 
 export const processMedicalReport = async (file, token) => {
